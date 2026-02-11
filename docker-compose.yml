@@ -1,0 +1,73 @@
+services:
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: medman
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - medman-network
+
+  mongo-express:
+    image: mongo-express:1.0.2-20-alpine3.19
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+      ME_CONFIG_MONGODB_AUTH_USERNAME: root
+      ME_CONFIG_MONGODB_AUTH_PASSWORD: example
+    depends_on:
+      - mongodb
+    networks:
+      - medman-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: medman-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      MONGODB_URI: "mongodb://root:example@mongodb:27017/medman?authSource=admin"
+      JWT_SECRET: "your_secure_jwt_secret_here_change_in_production"
+      MISTRAL_API_KEY: "your_mistral_api_key_here"
+    depends_on:
+      - mongodb
+    networks:
+      - medman-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: medman-frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - medman-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  medman-network:
+    driver: bridge

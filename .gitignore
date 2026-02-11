@@ -1,0 +1,49 @@
+# Rust
+/target/
+**/*.rs.bk
+
+# Node.js
+node_modules/
+*.log
+
+# Frontend build
+frontend/dist/
+frontend/.vite/
+
+# Environment files
+.env
+*.env.local
+*.env.development
+*.env.production
+
+# Docker
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Mac
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Runtime data
+data/
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+vendor/bundle/
+
+# Frontend dependencies
+frontend/node_modules/
+
+# Backend build artifacts
+backend/target/
