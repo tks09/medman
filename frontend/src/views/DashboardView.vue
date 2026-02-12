@@ -45,7 +45,7 @@ const fetchData = async () => {
 
     <div class="grid md:grid-cols-2 gap-8">
       <!-- Medication Plans Section -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
+      <div class="bg-white p-6 rounded-lg shadow-lg">
         <h2 class="text-xl font-semibold text-primary-600 mb-4">{{ t('dashboard.yourMedicationPlans') }}</h2>
 
         <div v-if="isLoading" class="text-center py-4">
@@ -55,23 +55,23 @@ const fetchData = async () => {
         <div v-else>
           <div v-if="plans.length === 0" class="text-center py-4">
             <p class="text-gray-600">{{ t('dashboard.noPlansYet') }}</p>
-            <RouterLink to="/generate-plan" class="text-primary-600 hover:underline">
+            <RouterLink to="/generate-plan" class="text-primary-600 hover:underline transition-colors">
               {{ t('dashboard.generateFirstPlan') }}
             </RouterLink>
           </div>
 
           <div v-else class="space-y-4">
-            <div v-for="plan in plans" :key="plan.id" class="border border-gray-200 rounded-lg p-4">
+            <div v-for="plan in plans" :key="plan.id" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
               <h3 class="font-medium text-primary-600">{{ plan.medication_name }}</h3>
               <p class="text-sm text-gray-600 mt-1">{{ t('dashboard.created') }} {{ new Date(plan.created_at).toLocaleDateString() }}</p>
               <div class="mt-3 flex space-x-2">
                 <RouterLink
                   :to="`/review/${plan.id}`"
-                  class="text-sm bg-primary-600 text-white px-3 py-1 rounded hover:bg-primary-700"
+                  class="text-sm bg-primary-600 text-white px-3 py-1 rounded hover:bg-primary-700 transition-all"
                 >
                   {{ t('dashboard.addReview') }}
                 </RouterLink>
-                <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300">
+                <button class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition-all">
                   {{ t('dashboard.viewPlan') }}
                 </button>
               </div>
@@ -80,14 +80,14 @@ const fetchData = async () => {
         </div>
 
         <div class="mt-6">
-          <RouterLink to="/generate-plan" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+          <RouterLink to="/generate-plan" class="bg-warm-500 text-white px-4 py-2 rounded-lg hover:bg-warm-600 transition-all shadow-lg">
             {{ t('dashboard.generateNewPlan') }}
           </RouterLink>
         </div>
       </div>
 
       <!-- Recent Reviews Section -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
+      <div class="bg-white p-6 rounded-lg shadow-lg">
         <h2 class="text-xl font-semibold text-primary-600 mb-4">{{ t('dashboard.recentReviews') }}</h2>
 
         <div v-if="isLoading" class="text-center py-4">
@@ -100,7 +100,7 @@ const fetchData = async () => {
           </div>
 
           <div v-else class="space-y-4 max-h-96 overflow-y-auto">
-            <div v-for="review in reviews.slice(0, 5)" :key="review.id" class="border border-gray-200 rounded-lg p-4">
+            <div v-for="review in reviews.slice(0, 5)" :key="review.id" class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
               <div class="flex justify-between items-start">
                 <div>
                   <p class="text-sm text-gray-500">

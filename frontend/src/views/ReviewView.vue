@@ -61,11 +61,11 @@ const submitReview = async () => {
       {{ error }}
     </div>
 
-    <div v-if="success" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+    <div v-if="success" class="bg-warm-100 border border-warm-400 text-warm-700 px-4 py-3 rounded mb-6">
       {{ t('review.reviewSubmitted') }}
     </div>
 
-    <div class="bg-white p-6 rounded-lg shadow-md">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
       <form @submit.prevent="submitReview" class="space-y-6">
         <div>
           <label for="date" class="block text-sm font-medium text-gray-700 mb-1">{{ t('review.date') }}</label>
@@ -74,7 +74,7 @@ const submitReview = async () => {
             v-model="date"
             type="date"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
           />
         </div>
 
@@ -87,7 +87,7 @@ const submitReview = async () => {
             v-model="symptoms"
             rows="3"
             :placeholder="t('review.symptomsPlaceholder')"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
           ></textarea>
         </div>
 
@@ -100,7 +100,7 @@ const submitReview = async () => {
             v-model="sideEffects"
             rows="3"
             :placeholder="t('review.sideEffectsPlaceholder')"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
           ></textarea>
         </div>
 
@@ -113,7 +113,7 @@ const submitReview = async () => {
             v-model="notes"
             rows="3"
             :placeholder="t('review.notesPlaceholder')"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
           ></textarea>
         </div>
 
@@ -137,7 +137,7 @@ const submitReview = async () => {
           <button
             type="submit"
             :disabled="isLoading"
-            class="bg-primary-600 text-white px-6 py-2 rounded-md hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
           >
             <span v-if="isLoading">{{ t('review.submitting') }}</span>
             <span v-else>{{ t('review.submitReview') }}</span>
