@@ -3,9 +3,11 @@ import { ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import api from '../services/api'
+import { useI18n } from 'vue-i18n'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const { t } = useI18n()
 
 const medicationName = ref('')
 const focusAreas = ref([''])
@@ -32,12 +34,12 @@ const generatePlan = async () => {
     const validFocusAreas = focusAreas.value.filter(area => area.trim() !== '')
 
     if (!medicationName.value.trim()) {
-      error.value = 'Please enter a medication name'
+      error.value = t('generatePlan.pleaseEnterMedicationName')
       return
     }
 
     if (validFocusAreas.length === 0) {
-      error.value = 'Please add at least one focus area'
+      error.value = t('generatePlan.pleaseAddFocusArea')
       return
     }
 
@@ -50,7 +52,7 @@ const generatePlan = async () => {
     generatedPlan.value = response
 
   } catch (err) {
-    error.value = err.error || err.message || 'Failed to generate plan'
+    error.value = err.error || err.message || t('generatePlan.error')
   } finally {
     isLoading.value = false
   }
@@ -65,7 +67,7 @@ const goToReview = () => {
 
 <template>
   <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold text-primary-600 mb-6">Generate Medication Plan</h1>
+    <h1 class="text-3xl font-bold text-primary-600 mb-6">{{ t('generatePlan.title') }}</h1>
 
     <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
       {{ error }}
@@ -75,34 +77,34 @@ const goToReview = () => {
       <form @submit.prevent="generatePlan" class="space-y-6">
         <div>
           <label for="medicationName" class="block text-sm font-medium text-gray-700 mb-1">
-            Medication Name
+            {{ t('generatePlan.medicationName') }}
           </label>
           <input
             id="medicationName"
             v-model="medicationName"
             type="text"
-            placeholder="e.g., Ritalin, Ibuprofen, etc."
+            :placeholder="t('generatePlan.medicationNamePlaceholder')"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
           <p class="text-sm text-gray-500 mt-1">
-            Enter the name of the medication you want to track
+            {{ t('generatePlan.medicationNameHelper') }}
           </p>
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            Focus Areas
+            {{ t('generatePlan.focusAreas') }}
           </label>
           <p class="text-sm text-gray-500 mb-2">
-            What specific aspects do you want to monitor? (e.g., digestive functions, mood, sleep, etc.)
+            {{ t('generatePlan.focusAreasHelper') }}
           </p>
 
           <div v-for="(area, index) in focusAreas" :key="index" class="flex items-center space-x-2 mb-2">
             <input
               v-model="focusAreas[index]"
               type="text"
-              placeholder="e.g., digestive functions, mood changes"
+              :placeholder="t('generatePlan.focusAreaPlaceholder')"
               class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
             <button
@@ -120,7 +122,7 @@ const goToReview = () => {
             @click="addFocusArea"
             class="text-primary-600 hover:text-primary-700 text-sm flex items-center"
           >
-            <span class="mr-1">+</span> Add another focus area
+            <span class="mr-1">+</span> {{ t('generatePlan.addFocusArea') }}
           </button>
         </div>
 
@@ -130,8 +132,8 @@ const goToReview = () => {
             :disabled="isLoading"
             class="bg-primary-600 text-white px-6 py-2 rounded-md hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span v-if="isLoading">Generating Plan...</span>
-            <span v-else>Generate Plan</span>
+            <span v-if="isLoading">{{ t('generatePlan.generatingPlan') }}</span>
+            <span v-else>{{ t('generatePlan.generatePlan') }}</span>
           </button>
         </div>
       </form>
@@ -139,18 +141,18 @@ const goToReview = () => {
 
     <div v-else class="bg-white p-6 rounded-lg shadow-md mt-6">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold text-primary-600">Generated Plan</h2>
+        <h2 class="text-xl font-semibold text-primary-600">{{ t('generatePlan.generatedPlan') }}</h2>
         <button
           @click="goToReview"
           class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
         >
-          Start Daily Review
+          {{ t('generatePlan.startDailyReview') }}
         </button>
       </div>
 
       <div class="prose max-w-none">
-        <h3 class="font-semibold mt-4 mb-2">Medication: {{ generatedPlan.medication_name }}</h3>
-        <h4 class="font-medium mb-2">Focus Areas:</h4>
+        <h3 class="font-semibold mt-4 mb-2">{{ t('generatePlan.medication') }} {{ generatedPlan.medication_name }}</h3>
+        <h4 class="font-medium mb-2">{{ t('generatePlan.focusAreasLabel') }}</h4>
         <ul class="list-disc list-inside mb-4">
           <li v-for="area in generatedPlan.focus_areas" :key="area">{{ area }}</li>
         </ul>
@@ -165,13 +167,13 @@ const goToReview = () => {
           @click="generatedPlan = null"
           class="text-gray-600 hover:text-gray-800 mr-4"
         >
-          Generate Another Plan
+          {{ t('generatePlan.generateAnotherPlan') }}
         </button>
         <button
           @click="goToReview"
           class="bg-primary-600 text-white px-4 py-2 rounded hover:bg-primary-700 transition"
         >
-          Start Daily Review
+          {{ t('generatePlan.startDailyReview') }}
         </button>
       </div>
     </div>

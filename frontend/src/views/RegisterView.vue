@@ -2,9 +2,11 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const { t } = useI18n()
 
 const username = ref('')
 const password = ref('')
@@ -14,7 +16,7 @@ const isLoading = ref(false)
 
 const handleRegister = async () => {
   if (password.value !== confirmPassword.value) {
-    error.value = 'Passwords do not match'
+    error.value = t('register.passwordsDoNotMatch')
     return
   }
 
@@ -26,7 +28,7 @@ const handleRegister = async () => {
 
     router.push('/dashboard')
   } catch (err) {
-    error.value = err.error || err.message || 'Registration failed'
+    error.value = err.error || err.message || t('register.error')
   } finally {
     isLoading.value = false
   }
@@ -36,11 +38,11 @@ const handleRegister = async () => {
 <template>
   <div class="max-w-md mx-auto mt-12">
     <div class="bg-white p-8 rounded-lg shadow-md">
-      <h2 class="text-2xl font-bold text-primary-600 text-center mb-6">Register</h2>
+      <h2 class="text-2xl font-bold text-primary-600 text-center mb-6">{{ t('register.title') }}</h2>
 
       <form @submit.prevent="handleRegister" class="space-y-4">
         <div>
-          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">{{ t('register.username') }}</label>
           <input
             id="username"
             v-model="username"
@@ -51,7 +53,7 @@ const handleRegister = async () => {
         </div>
 
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">{{ t('register.password') }}</label>
           <input
             id="password"
             v-model="password"
@@ -63,7 +65,7 @@ const handleRegister = async () => {
         </div>
 
         <div>
-          <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">{{ t('register.confirmPassword') }}</label>
           <input
             id="confirmPassword"
             v-model="confirmPassword"
@@ -83,15 +85,15 @@ const handleRegister = async () => {
           :disabled="isLoading"
           class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span v-if="isLoading">Registering...</span>
-          <span v-else>Register</span>
+          <span v-if="isLoading">{{ t('register.registering') }}</span>
+          <span v-else>{{ t('register.register') }}</span>
         </button>
       </form>
 
       <div class="mt-4 text-center">
         <p class="text-sm text-gray-600">
-          Already have an account?
-          <RouterLink to="/login" class="text-primary-600 hover:underline">Login</RouterLink>
+          {{ t('register.alreadyHaveAccount') }}
+          <RouterLink to="/login" class="text-primary-600 hover:underline">{{ t('register.login') }}</RouterLink>
         </p>
       </div>
     </div>

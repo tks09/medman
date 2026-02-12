@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import api from '../services/api'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const planId = route.params.planId
 const date = ref(new Date().toISOString().split('T')[0])
@@ -44,7 +46,7 @@ const submitReview = async () => {
     }, 2000)
 
   } catch (err) {
-    error.value = err.error || err.message || 'Failed to submit review'
+    error.value = err.error || err.message || t('review.error')
   } finally {
     isLoading.value = false
   }
@@ -53,20 +55,20 @@ const submitReview = async () => {
 
 <template>
   <div class="max-w-3xl mx-auto">
-    <h1 class="text-3xl font-bold text-primary-600 mb-6">Daily Medication Review</h1>
+    <h1 class="text-3xl font-bold text-primary-600 mb-6">{{ t('review.title') }}</h1>
 
     <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
       {{ error }}
     </div>
 
     <div v-if="success" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-      Review submitted successfully! Redirecting to dashboard...
+      {{ t('review.reviewSubmitted') }}
     </div>
 
     <div class="bg-white p-6 rounded-lg shadow-md">
       <form @submit.prevent="submitReview" class="space-y-6">
         <div>
-          <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+          <label for="date" class="block text-sm font-medium text-gray-700 mb-1">{{ t('review.date') }}</label>
           <input
             id="date"
             v-model="date"
@@ -78,46 +80,46 @@ const submitReview = async () => {
 
         <div>
           <label for="symptoms" class="block text-sm font-medium text-gray-700 mb-1">
-            Symptoms Experienced
+            {{ t('review.symptoms') }}
           </label>
           <textarea
             id="symptoms"
             v-model="symptoms"
             rows="3"
-            placeholder="Describe any symptoms you experienced (e.g., headache, nausea, fatigue)"
+            :placeholder="t('review.symptomsPlaceholder')"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
           ></textarea>
         </div>
 
         <div>
           <label for="sideEffects" class="block text-sm font-medium text-gray-700 mb-1">
-            Side Effects
+            {{ t('review.sideEffects') }}
           </label>
           <textarea
             id="sideEffects"
             v-model="sideEffects"
             rows="3"
-            placeholder="Describe any side effects, especially related to your focus areas"
+            :placeholder="t('review.sideEffectsPlaceholder')"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
           ></textarea>
         </div>
 
         <div>
           <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
-            Additional Notes
+            {{ t('review.notes') }}
           </label>
           <textarea
             id="notes"
             v-model="notes"
             rows="3"
-            placeholder="Any other observations or notes about your medication experience"
+            :placeholder="t('review.notesPlaceholder')"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
           ></textarea>
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            Overall Rating (1-10)
+            {{ t('review.rating') }}
           </label>
           <input
             v-model.number="rating"
@@ -137,8 +139,8 @@ const submitReview = async () => {
             :disabled="isLoading"
             class="bg-primary-600 text-white px-6 py-2 rounded-md hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span v-if="isLoading">Submitting...</span>
-            <span v-else>Submit Review</span>
+            <span v-if="isLoading">{{ t('review.submitting') }}</span>
+            <span v-else>{{ t('review.submitReview') }}</span>
           </button>
         </div>
       </form>
