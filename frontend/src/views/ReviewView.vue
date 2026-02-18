@@ -55,31 +55,31 @@ const submitReview = async () => {
 
 <template>
   <div class="max-w-3xl mx-auto">
-    <h1 class="text-3xl font-bold text-primary-600 mb-6">{{ t('review.title') }}</h1>
+    <h1 class="text-3xl font-bold text-primary-400 mb-6">{{ t('review.title') }}</h1>
 
-    <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+    <div v-if="error" class="bg-red-950 border border-red-700 text-red-300 px-4 py-3 rounded mb-6">
       {{ error }}
     </div>
 
-    <div v-if="success" class="bg-warm-100 border border-warm-400 text-warm-700 px-4 py-3 rounded mb-6">
+    <div v-if="success" class="bg-amber-950 border border-amber-700 text-amber-300 px-4 py-3 rounded mb-6">
       {{ t('review.reviewSubmitted') }}
     </div>
 
-    <div class="bg-white p-6 rounded-lg shadow-lg">
+    <div class="bg-navy-800 p-6 rounded-lg shadow-lg border border-navy-700">
       <form @submit.prevent="submitReview" class="space-y-6">
         <div>
-          <label for="date" class="block text-sm font-medium text-gray-700 mb-1">{{ t('review.date') }}</label>
+          <label for="date" class="block text-sm font-medium text-gray-300 mb-1">{{ t('review.date') }}</label>
           <input
             id="date"
             v-model="date"
             type="date"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            class="w-full px-3 py-2 bg-navy-900 border border-navy-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
           />
         </div>
 
         <div>
-          <label for="symptoms" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="symptoms" class="block text-sm font-medium text-gray-300 mb-1">
             {{ t('review.symptoms') }}
           </label>
           <textarea
@@ -87,12 +87,12 @@ const submitReview = async () => {
             v-model="symptoms"
             rows="3"
             :placeholder="t('review.symptomsPlaceholder')"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            class="w-full px-3 py-2 bg-navy-900 border border-navy-600 text-gray-100 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
           ></textarea>
         </div>
 
         <div>
-          <label for="sideEffects" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="sideEffects" class="block text-sm font-medium text-gray-300 mb-1">
             {{ t('review.sideEffects') }}
           </label>
           <textarea
@@ -100,12 +100,12 @@ const submitReview = async () => {
             v-model="sideEffects"
             rows="3"
             :placeholder="t('review.sideEffectsPlaceholder')"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            class="w-full px-3 py-2 bg-navy-900 border border-navy-600 text-gray-100 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
           ></textarea>
         </div>
 
         <div>
-          <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="notes" class="block text-sm font-medium text-gray-300 mb-1">
             {{ t('review.notes') }}
           </label>
           <textarea
@@ -113,12 +113,12 @@ const submitReview = async () => {
             v-model="notes"
             rows="3"
             :placeholder="t('review.notesPlaceholder')"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            class="w-full px-3 py-2 bg-navy-900 border border-navy-600 text-gray-100 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
           ></textarea>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium text-gray-300 mb-1">
             {{ t('review.rating') }}
           </label>
           <input
@@ -126,10 +126,10 @@ const submitReview = async () => {
             type="range"
             min="1"
             max="10"
-            class="w-full"
+            class="w-full accent-primary-500"
           />
           <div class="text-center mt-1">
-            <span class="font-medium">{{ rating }}</span>
+            <span class="font-medium text-primary-400 text-lg">{{ rating }}</span>
           </div>
         </div>
 
@@ -137,7 +137,7 @@ const submitReview = async () => {
           <button
             type="submit"
             :disabled="isLoading"
-            class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
           >
             <span v-if="isLoading">{{ t('review.submitting') }}</span>
             <span v-else>{{ t('review.submitReview') }}</span>

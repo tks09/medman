@@ -1,6 +1,6 @@
 {
   "common": {
-    "medicineManager": "Gestionnaire de médicaments",
+    "medicineManager": "MedMan",
     "login": "Connexion",
     "register": "Inscription",
     "logout": "Déconnexion",

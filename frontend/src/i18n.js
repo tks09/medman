@@ -7,7 +7,7 @@ import frTranslations from './locales/fr.json'
 
 const i18n = createI18n({
   legacy: false, // you must set this to false for Composition API
-  locale: 'en', // set default locale
+  locale: localStorage.getItem('locale') || 'en', // restore saved locale
   fallbackLocale: 'en', // set fallback locale
   messages: {
     en: enTranslations,

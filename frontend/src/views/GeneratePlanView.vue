@@ -67,16 +67,16 @@ const goToReview = () => {
 
 <template>
   <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold text-primary-600 mb-6">{{ t('generatePlan.title') }}</h1>
+    <h1 class="text-3xl font-bold text-primary-400 mb-6">{{ t('generatePlan.title') }}</h1>
 
-    <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+    <div v-if="error" class="bg-red-950 border border-red-700 text-red-300 px-4 py-3 rounded mb-6">
       {{ error }}
     </div>
 
-    <div v-if="!generatedPlan" class="bg-white p-6 rounded-lg shadow-lg">
+    <div v-if="!generatedPlan" class="bg-navy-800 p-6 rounded-lg shadow-lg border border-navy-700">
       <form @submit.prevent="generatePlan" class="space-y-6">
         <div>
-          <label for="medicationName" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="medicationName" class="block text-sm font-medium text-gray-300 mb-1">
             {{ t('generatePlan.medicationName') }}
           </label>
           <input
@@ -85,7 +85,7 @@ const goToReview = () => {
             type="text"
             :placeholder="t('generatePlan.medicationNamePlaceholder')"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+            class="w-full px-3 py-2 bg-navy-900 border border-navy-600 text-gray-100 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
           />
           <p class="text-sm text-gray-500 mt-1">
             {{ t('generatePlan.medicationNameHelper') }}
@@ -93,7 +93,7 @@ const goToReview = () => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium text-gray-300 mb-1">
             {{ t('generatePlan.focusAreas') }}
           </label>
           <p class="text-sm text-gray-500 mb-2">
@@ -105,12 +105,12 @@ const goToReview = () => {
               v-model="focusAreas[index]"
               type="text"
               :placeholder="t('generatePlan.focusAreaPlaceholder')"
-              class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+              class="flex-1 px-3 py-2 bg-navy-900 border border-navy-600 text-gray-100 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
             />
             <button
               type="button"
               @click="removeFocusArea(index)"
-              class="text-red-500 hover:text-red-700 text-xl font-bold transition-colors"
+              class="text-red-400 hover:text-red-300 text-xl font-bold transition-colors"
               :disabled="focusAreas.length === 1"
             >
               ×
@@ -120,7 +120,7 @@ const goToReview = () => {
           <button
             type="button"
             @click="addFocusArea"
-            class="text-primary-600 hover:text-primary-700 text-sm flex items-center transition-colors"
+            class="text-primary-400 hover:text-primary-300 text-sm flex items-center transition-colors"
           >
             <span class="mr-1">+</span> {{ t('generatePlan.addFocusArea') }}
           </button>
@@ -130,7 +130,7 @@ const goToReview = () => {
           <button
             type="submit"
             :disabled="isLoading"
-            class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
           >
             <span v-if="isLoading">{{ t('generatePlan.generatingPlan') }}</span>
             <span v-else>{{ t('generatePlan.generatePlan') }}</span>
@@ -139,39 +139,39 @@ const goToReview = () => {
       </form>
     </div>
 
-    <div v-else class="bg-white p-6 rounded-lg shadow-lg mt-6">
+    <div v-else class="bg-navy-800 p-6 rounded-lg shadow-lg border border-navy-700 mt-6">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold text-primary-600">{{ t('generatePlan.generatedPlan') }}</h2>
+        <h2 class="text-xl font-semibold text-primary-400">{{ t('generatePlan.generatedPlan') }}</h2>
         <button
           @click="goToReview"
-          class="bg-warm-500 text-white px-4 py-2 rounded-lg hover:bg-warm-600 transition-all shadow-lg"
+          class="bg-warm-600 text-white px-4 py-2 rounded-lg hover:bg-warm-500 transition-all shadow-lg"
         >
           {{ t('generatePlan.startDailyReview') }}
         </button>
       </div>
 
       <div class="prose max-w-none">
-        <h3 class="font-semibold mt-4 mb-2">{{ t('generatePlan.medication') }} {{ generatedPlan.medication_name }}</h3>
-        <h4 class="font-medium mb-2">{{ t('generatePlan.focusAreasLabel') }}</h4>
-        <ul class="list-disc list-inside mb-4">
+        <h3 class="font-semibold text-gray-200 mt-4 mb-2">{{ t('generatePlan.medication') }} {{ generatedPlan.medication_name }}</h3>
+        <h4 class="font-medium text-gray-300 mb-2">{{ t('generatePlan.focusAreasLabel') }}</h4>
+        <ul class="list-disc list-inside mb-4 text-gray-400">
           <li v-for="area in generatedPlan.focus_areas" :key="area">{{ area }}</li>
         </ul>
 
-        <div class="bg-primary-50 p-4 rounded-lg">
-          <pre class="whitespace-pre-wrap text-sm">{{ generatedPlan.plan_content }}</pre>
+        <div class="bg-navy-900 border border-navy-600 p-4 rounded-lg">
+          <pre class="whitespace-pre-wrap text-sm text-gray-300">{{ generatedPlan.plan_content }}</pre>
         </div>
       </div>
 
       <div class="mt-6 flex justify-end">
         <button
           @click="generatedPlan = null"
-          class="text-gray-600 hover:text-gray-800 mr-4 transition-colors"
+          class="text-gray-400 hover:text-gray-200 mr-4 transition-colors"
         >
           {{ t('generatePlan.generateAnotherPlan') }}
         </button>
         <button
           @click="goToReview"
-          class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-all shadow-lg"
+          class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-500 transition-all shadow-lg"
         >
           {{ t('generatePlan.startDailyReview') }}
         </button>

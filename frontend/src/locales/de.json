@@ -1,6 +1,6 @@
 {
   "common": {
-    "medicineManager": "Medikamenten-Manager",
+    "medicineManager": "MedMan",
     "login": "Anmelden",
     "register": "Registrieren",
     "logout": "Abmelden",
@@ -174,7 +174,7 @@
     "twentieth": "Zwanzigste"
   },
   "navbar": {
-    "medicineManager": "Medikamenten-Manager",
+    "medicineManager": "MedMan",
     "dashboard": "Dashboard",
     "generatePlan": "Plan erstellen",
     "login": "Anmelden",
@@ -183,7 +183,7 @@
     "welcome": "Willkommen"
   },
   "home": {
-    "title": "Medikamenten-Manager",
+    "title": "MedMan",
     "subtitle": "Verfolgen Sie die Wirkungen und Nebenwirkungen Ihrer Medikamente mit KI-gestützten Einblicken",
     "goToDashboard": "Zum Dashboard",
     "generateNewPlan": "Neuen Plan erstellen",

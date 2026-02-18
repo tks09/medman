@@ -1,6 +1,6 @@
 {
   "common": {
-    "medicineManager": "Medicine Manager",
+    "medicineManager": "MedMan",
     "login": "Login",
     "register": "Register",
     "logout": "Logout",
@@ -194,7 +194,7 @@
     "twentieth": "Twentieth"
   },
   "navbar": {
-    "medicineManager": "Medicine Manager",
+    "medicineManager": "MedMan",
     "dashboard": "Dashboard",
     "generatePlan": "Generate Plan",
     "login": "Login",
@@ -203,7 +203,7 @@
     "welcome": "Welcome"
   },
   "home": {
-    "title": "Medicine Manager",
+    "title": "MedMan",
     "subtitle": "Track your medication effects and side effects with AI-powered insights",
     "goToDashboard": "Go to Dashboard",
     "generateNewPlan": "Generate New Plan",
