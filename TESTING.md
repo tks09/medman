@@ -17,10 +17,9 @@ it, seeds known data, and asserts each test case.
   ```
 - `curl` and `jq` for invoking and parsing responses.
 
-> The repo's `Dockerfile` does not copy `src/` and `docker-compose.yml`
-> references a non-existent `./backend` context, so we deliberately
-> avoid `docker-compose up` here and run the binary natively. Fixing
-> the docker setup is out of scope for this PR.
+> The native-binary path below is the primary, fast feedback loop.
+> A separate end-to-end smoke test against `docker-compose` is in
+> section 6.
 
 ## 1. Start MongoDB
 
@@ -102,10 +101,12 @@ For each case, record both HTTP status and body. All cases must pass.
 ```bash
 curl -s -o /tmp/t1.json -w '%{http_code}\n' \
   "http://127.0.0.1:3000/api/medication/plans?user_id=${USER_A}"
-jq 'length, [.[].medication_name] | sort' /tmp/t1.json
+jq 'length, [.[].medication_name] | sort, .[0] | keys' /tmp/t1.json
 ```
 
-Expected: status `200`, length `2`, names `["Ibuprofen","Ritalin"]`.
+Expected: status `200`, length `2`, names `["Ibuprofen","Ritalin"]`,
+each item has key `id` (not `_id`), and `id` + `user_id` are 24-char
+hex strings (not nested `{"$oid": …}` objects).
 
 ### T2 — happy path: user with no plans
 
@@ -155,7 +156,34 @@ curl -s -o /tmp/t5.json -w '%{http_code}\n' \
 Expected: status is **not** `405`. Any of `400`/`415`/`422`/`500` is
 acceptable for this smoke check.
 
-## 5. Cleanup
+## 5. End-to-end smoke test via docker-compose
+
+Verifies the `Dockerfile` and `docker-compose.yml` fixes by building
+and running the backend service stack from scratch. Skip this section
+if you only need to verify the API contract.
+
+```bash
+cd "$(git rev-parse --show-toplevel)"
+docker compose up -d --build mongodb backend
+
+# Wait for backend health (compose runs it on host port 3000).
+until curl -sf http://127.0.0.1:3000/api/health >/dev/null; do sleep 2; done
+
+# Empty list against a fresh DB:
+curl -s -w '\nHTTP %{http_code}\n' \
+  "http://127.0.0.1:3000/api/medication/plans?user_id=000000000000000000000099"
+```
+
+Expected: backend builds, `/api/health` reachable, last call returns
+`200` with body `[]`.
+
+Cleanup:
+
+```bash
+docker compose down -v
+```
+
+## 6. Cleanup (native-binary path)
 
 ```bash
 kill "$(cat /tmp/medman.pid)" 2>/dev/null || true

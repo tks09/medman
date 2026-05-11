@@ -1,6 +1,7 @@
 use crate::error::AppError;
 use crate::models::{
-    CreateReviewRequest, GeneratePlanRequest, GetPlansQuery, MedicationPlan, MedicationReview,
+    CreateReviewRequest, GeneratePlanRequest, GetPlansQuery, MedicationPlan,
+    MedicationPlanResponse, MedicationReview, MedicationReviewResponse,
 };
 use crate::AppState;
 use axum::{
@@ -16,7 +17,7 @@ use serde_json::json;
 pub async fn generate_plan(
     State(state): State<AppState>,
     Json(payload): Json<GeneratePlanRequest>,
-) -> Result<Json<MedicationPlan>, AppError> {
+) -> Result<Json<MedicationPlanResponse>, AppError> {
     // Generate plan using Mistral AI API
     let plan_content = generate_ai_plan(&payload.medication_name, &payload.focus_areas).await?;
 
@@ -39,19 +40,24 @@ pub async fn generate_plan(
     let mut plan_with_id = plan;
     plan_with_id.id = Some(plan_id);
 
-    Ok(Json(plan_with_id))
+    Ok(Json(plan_with_id.into()))
 }
 
 pub async fn get_plans(
     State(state): State<AppState>,
     Query(params): Query<GetPlansQuery>,
-) -> Result<Json<Vec<MedicationPlan>>, AppError> {
+) -> Result<Json<Vec<MedicationPlanResponse>>, AppError> {
     let user_id = ObjectId::parse_str(&params.user_id)?;
 
     let plans_collection = state.db.collection::<MedicationPlan>("medication_plans");
     let cursor = plans_collection.find(doc! {"user_id": user_id}).await?;
 
-    let plans = cursor.try_collect::<Vec<_>>().await?;
+    let plans: Vec<MedicationPlanResponse> = cursor
+        .try_collect::<Vec<_>>()
+        .await?
+        .into_iter()
+        .map(Into::into)
+        .collect();
 
     Ok(Json(plans))
 }
@@ -59,7 +65,7 @@ pub async fn get_plans(
 pub async fn get_reviews(
     State(state): State<AppState>,
     // Add user_id parameter extraction here
-) -> Result<Json<Vec<MedicationReview>>, AppError> {
+) -> Result<Json<Vec<MedicationReviewResponse>>, AppError> {
     // TODO: Implement proper user authentication and extract user_id
     let user_id = ObjectId::parse_str("65d0b2b3d3b0b3d3b0b3d3b0")?; // Placeholder
 
@@ -68,7 +74,12 @@ pub async fn get_reviews(
         .collection::<MedicationReview>("medication_reviews");
     let cursor = reviews_collection.find(doc! {"user_id": user_id}).await?;
 
-    let reviews = cursor.try_collect::<Vec<_>>().await?;
+    let reviews: Vec<MedicationReviewResponse> = cursor
+        .try_collect::<Vec<_>>()
+        .await?
+        .into_iter()
+        .map(Into::into)
+        .collect();
 
     Ok(Json(reviews))
 }
@@ -76,7 +87,7 @@ pub async fn get_reviews(
 pub async fn create_review(
     State(state): State<AppState>,
     Json(payload): Json<CreateReviewRequest>,
-) -> Result<Json<MedicationReview>, AppError> {
+) -> Result<Json<MedicationReviewResponse>, AppError> {
     let user_id = ObjectId::parse_str(&payload.user_id)?;
     let plan_id = ObjectId::parse_str(&payload.plan_id)?;
     let date = ChronoDateTime::parse_from_rfc3339(&payload.date)
@@ -103,7 +114,7 @@ pub async fn create_review(
     let mut review_with_id = review;
     review_with_id.id = Some(review_id);
 
-    Ok(Json(review_with_id))
+    Ok(Json(review_with_id.into()))
 }
 
 async fn generate_ai_plan(
