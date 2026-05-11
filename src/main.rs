@@ -33,7 +33,7 @@ async fn main() {
         .route("/api/auth/login", post(routes::auth::login))
         .route(
             "/api/medication/plans",
-            post(routes::medication::generate_plan),
+            post(routes::medication::generate_plan).get(routes::medication::get_plans),
         )
         .route(
             "/api/medication/reviews",

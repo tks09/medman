@@ -1,7 +1,12 @@
 use crate::error::AppError;
-use crate::models::{CreateReviewRequest, GeneratePlanRequest, MedicationPlan, MedicationReview};
+use crate::models::{
+    CreateReviewRequest, GeneratePlanRequest, GetPlansQuery, MedicationPlan, MedicationReview,
+};
 use crate::AppState;
-use axum::{extract::State, Json};
+use axum::{
+    extract::{Query, State},
+    Json,
+};
 use chrono::DateTime as ChronoDateTime;
 use futures_util::stream::TryStreamExt;
 use mongodb::bson::{doc, oid::ObjectId, DateTime};
@@ -35,6 +40,20 @@ pub async fn generate_plan(
     plan_with_id.id = Some(plan_id);
 
     Ok(Json(plan_with_id))
+}
+
+pub async fn get_plans(
+    State(state): State<AppState>,
+    Query(params): Query<GetPlansQuery>,
+) -> Result<Json<Vec<MedicationPlan>>, AppError> {
+    let user_id = ObjectId::parse_str(&params.user_id)?;
+
+    let plans_collection = state.db.collection::<MedicationPlan>("medication_plans");
+    let cursor = plans_collection.find(doc! {"user_id": user_id}).await?;
+
+    let plans = cursor.try_collect::<Vec<_>>().await?;
+
+    Ok(Json(plans))
 }
 
 pub async fn get_reviews(

@@ -55,6 +55,11 @@ pub struct GeneratePlanRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct GetPlansQuery {
+    pub user_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CreateReviewRequest {
     pub user_id: String,
     pub plan_id: String,
