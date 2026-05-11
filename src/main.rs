@@ -33,7 +33,7 @@ async fn main() {
         .route("/api/auth/login", post(routes::auth::login))
         .route(
             "/api/medication/plans",
-            post(routes::medication::generate_plan),
+            post(routes::medication::generate_plan).get(routes::medication::get_plans),
         )
         .route(
             "/api/medication/reviews",
@@ -56,8 +56,8 @@ async fn main() {
         )
         .fallback(routes::not_found::handler_404);
 
-    // Run it
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    // Bind on all interfaces so the service is reachable when run in a container.
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     log::info!("Server running on http://{}", addr);
 
     axum::serve(tokio::net::TcpListener::bind(&addr).await.unwrap(), app)

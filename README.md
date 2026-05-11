@@ -185,7 +185,7 @@ npm run preview
 
 ### Medication Plans
 - `POST /api/medication/plans` - Generate a new medication plan
-- `GET /api/medication/plans` - Get user's medication plans (TODO)
+- `GET /api/medication/plans` - Get user's medication plans (query param: `user_id`)
 
 ### Reviews
 - `GET /api/medication/reviews` - Get user's medication reviews
