@@ -205,6 +205,8 @@
   "home": {
     "title": "Medicine Manager",
     "subtitle": "Track your medication effects and side effects with AI-powered insights",
+    "login": "Login",
+    "register": "Register",
     "goToDashboard": "Go to Dashboard",
     "generateNewPlan": "Generate New Plan",
     "aiPoweredPlans": "AI-Powered Plans",

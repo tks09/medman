@@ -185,6 +185,8 @@
   "home": {
     "title": "Gestionnaire de médicaments",
     "subtitle": "Suivez les effets et les effets secondaires de vos médicaments avec des insights alimentés par l'IA",
+    "login": "Connexion",
+    "register": "Inscription",
     "goToDashboard": "Aller au tableau de bord",
     "generateNewPlan": "Générer un nouveau plan",
     "aiPoweredPlans": "Plans alimentés par l'IA",
