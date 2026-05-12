@@ -34,11 +34,9 @@ services:
     networks:
       - medman-network
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: medman-backend
+  medman:
+    image: ghcr.io/tks09/medman:latest
+    container_name: medman
     restart: always
     ports:
       - "3000:3000"
@@ -48,19 +46,6 @@ services:
       MISTRAL_API_KEY: "your_mistral_api_key_here"
     depends_on:
       - mongodb
-    networks:
-      - medman-network
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: medman-frontend
-    restart: always
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
     networks:
       - medman-network
 
