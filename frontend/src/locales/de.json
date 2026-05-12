@@ -185,6 +185,8 @@
   "home": {
     "title": "MedMan",
     "subtitle": "Verfolgen Sie die Wirkungen und Nebenwirkungen Ihrer Medikamente mit KI-gestützten Einblicken",
+    "login": "Anmelden",
+    "register": "Registrieren",
     "goToDashboard": "Zum Dashboard",
     "generateNewPlan": "Neuen Plan erstellen",
     "aiPoweredPlans": "KI-gestützte Pläne",
