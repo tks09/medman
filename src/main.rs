@@ -5,8 +5,10 @@ use axum::{
 };
 use dotenv::dotenv;
 use std::net::SocketAddr;
+use std::path::PathBuf;
 
 use tower_http::cors::{Any, CorsLayer};
+use tower_http::services::ServeDir;
 
 mod auth;
 mod database;
@@ -27,7 +29,9 @@ async fn main() {
     let shared_state = AppState { db: db.clone() };
     log::info!("Starting MedMan");
     // Build our application with routes
-    let app = Router::new()
+    let static_dir = PathBuf::from("./static");
+
+    let api_routes = Router::new()
         .route("/api/health", get(routes::health::health_check))
         .route("/api/auth/register", post(routes::auth::register))
         .route("/api/auth/login", post(routes::auth::login))
@@ -53,7 +57,11 @@ async fn main() {
                     axum::http::header::CONTENT_TYPE,
                     axum::http::header::AUTHORIZATION,
                 ]),
-        )
+        );
+
+    let app = Router::new()
+        .merge(api_routes)
+        .nest_service("/", ServeDir::new(&static_dir))
         .fallback(routes::not_found::handler_404);
 
     // Bind on all interfaces so the service is reachable when run in a container.
