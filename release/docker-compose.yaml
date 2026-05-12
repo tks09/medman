@@ -1,0 +1,37 @@
+services:
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: medman
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - medman-network
+
+  medman:
+    image: ghcr.io/tks09/medman:latest
+    container_name: medman
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      MONGODB_URI: "mongodb://root:example@mongodb:27017/medman?authSource=admin"
+      JWT_SECRET: "your_secure_jwt_secret_here_change_in_production"
+      MISTRAL_API_KEY: "your_mistral_api_key_here"
+    depends_on:
+      - mongodb
+    networks:
+      - medman-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  medman-network:
+    driver: bridge
