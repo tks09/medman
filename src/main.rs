@@ -61,8 +61,7 @@ async fn main() {
 
     let app = Router::new()
         .merge(api_routes)
-        .nest_service("/", ServeDir::new(&static_dir))
-        .fallback(routes::not_found::handler_404);
+        .fallback_service(ServeDir::new(&static_dir).append_index_html_on_directories(true));
 
     // Bind on all interfaces so the service is reachable when run in a container.
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
