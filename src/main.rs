@@ -22,48 +22,49 @@ async fn main() {
 
     tracing_subscriber::fmt::init();
 
-    // Initialize database
     let db = database::init_db().await;
-
-    // Create shared state
     let shared_state = AppState { db: db.clone() };
+
     log::info!("Starting MedMan");
-    // Build our application with routes
+
     let static_dir = PathBuf::from("./static");
 
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_headers([
+            axum::http::header::CONTENT_TYPE,
+            axum::http::header::AUTHORIZATION,
+        ]);
+
     let api_routes = Router::new()
+        // Health
         .route("/api/health", get(routes::health::health_check))
-        .route("/api/auth/register", post(routes::auth::register))
+        // Auth (new email-based)
+        .route("/api/auth/signup", post(routes::auth::signup))
         .route("/api/auth/login", post(routes::auth::login))
+        // Plans (new medman-vue format)
+        .route("/api/plans", get(routes::plans::get_plans).post(routes::plans::create_plan))
+        .route("/api/plans/:id/series", get(routes::plans::get_plan_series))
+        // Checkins
+        .route("/api/checkins", post(routes::checkins::log_checkin))
+        // Insights
+        .route("/api/insights", get(routes::insights::get_insights))
+        // Legacy medication routes (kept for backward compat)
         .route(
             "/api/medication/plans",
             post(routes::medication::generate_plan).get(routes::medication::get_plans),
         )
-        .route(
-            "/api/medication/reviews",
-            get(routes::medication::get_reviews),
-        )
-        .route(
-            "/api/medication/reviews",
-            post(routes::medication::create_review),
-        )
+        .route("/api/medication/reviews", get(routes::medication::get_reviews))
+        .route("/api/medication/reviews", post(routes::medication::create_review))
         .with_state(shared_state)
         .layer(tower_http::trace::TraceLayer::new_for_http())
-        .layer(
-            CorsLayer::new()
-                .allow_origin(Any)
-                .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
-                .allow_headers([
-                    axum::http::header::CONTENT_TYPE,
-                    axum::http::header::AUTHORIZATION,
-                ]),
-        );
+        .layer(cors);
 
     let app = Router::new()
         .merge(api_routes)
         .fallback_service(ServeDir::new(&static_dir).append_index_html_on_directories(true));
 
-    // Bind on all interfaces so the service is reachable when run in a container.
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     log::info!("Server running on http://{}", addr);
 

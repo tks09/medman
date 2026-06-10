@@ -1,71 +1,93 @@
 <script setup>
-import { useAuthStore } from '../stores/auth'
+import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { usePlans } from '../stores'
+import BaseIcon from '../components/BaseIcon.vue'
+import MoodFaces from '../components/MoodFaces.vue'
 
-const authStore = useAuthStore()
-const router = useRouter()
 const { t } = useI18n()
+const plans = usePlans()
+const router = useRouter()
+
+onMounted(() => { if (!plans.loaded) plans.load() })
+
+const active = computed(() => plans.active)
+
+const greeting = computed(() => {
+  const h = new Date().getHours()
+  if (h < 12) return t('home.goodMorning')
+  if (h < 17) return t('home.goodAfternoon')
+  return t('home.goodEvening')
+})
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto text-center py-12">
-    <h1 class="text-4xl font-bold text-primary-400 mb-6">{{ t('home.title') }}</h1>
-    <p class="text-xl text-gray-400 mb-8">
-      {{ t('home.subtitle') }}
-    </p>
-
-    <div class="flex justify-center space-x-4">
-      <template v-if="authStore.isAuthenticated">
-        <RouterLink to="/dashboard" class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-500 transition-all shadow-lg">
-          {{ t('home.goToDashboard') }}
-        </RouterLink>
-        <RouterLink to="/generate-plan" class="bg-warm-600 text-white px-6 py-3 rounded-lg hover:bg-warm-500 transition-all shadow-lg">
-          {{ t('home.generateNewPlan') }}
-        </RouterLink>
-      </template>
-      <template v-else>
-        <RouterLink to="/login" class="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-500 transition-all shadow-lg">
-          {{ t('navbar.login') }}
-        </RouterLink>
-        <RouterLink to="/register" class="bg-warm-600 text-white px-6 py-3 rounded-lg hover:bg-warm-500 transition-all shadow-lg">
-          {{ t('navbar.register') }}
-        </RouterLink>
-      </template>
+  <div class="screen">
+    <div style="margin-top:6px;margin-bottom:18px">
+      <div class="h-xl">{{ greeting }}</div>
     </div>
 
-    <div class="mt-16 grid md:grid-cols-3 gap-8">
-      <div class="bg-navy-800 p-6 rounded-lg shadow-lg hover:shadow-xl hover:border-primary-600 border border-navy-700 transition-all duration-300">
-        <div class="w-12 h-12 bg-primary-600/20 text-primary-400 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-          </svg>
-        </div>
-        <h3 class="text-xl font-semibold text-primary-400 mb-3">{{ t('home.aiPoweredPlans') }}</h3>
-        <p class="text-gray-400">{{ t('home.aiPoweredPlansDescription') }}</p>
+    <!-- check-in hero -->
+    <div v-if="active" class="glass strong card" style="border-radius:var(--radius)">
+      <div class="row between center">
+        <div class="eyebrow">{{ $t('home.todaysCheckin') }}</div>
+        <span class="tag">{{ $t('home.twoMin') }}</span>
       </div>
-      <div class="bg-navy-800 p-6 rounded-lg shadow-lg hover:shadow-xl hover:border-primary-600 border border-navy-700 transition-all duration-300">
-        <div class="w-12 h-12 bg-primary-600/20 text-primary-400 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-          </svg>
-        </div>
-        <h3 class="text-xl font-semibold text-primary-400 mb-3">{{ t('home.dailyTracking') }}</h3>
-        <p class="text-gray-400">{{ t('home.dailyTrackingDescription') }}</p>
+      <div class="h-md" style="margin-top:8px">{{ $t('home.howFeelingOn', { name: active.name }) }}</div>
+      <div style="margin-top:16px">
+        <MoodFaces :mood="plans.mood" @update:mood="plans.setMood" :size="40" />
       </div>
-      <div class="bg-navy-800 p-6 rounded-lg shadow-lg hover:shadow-xl hover:border-primary-600 border border-navy-700 transition-all duration-300">
-        <div class="w-12 h-12 bg-primary-600/20 text-primary-400 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
+      <button class="btn primary block" style="margin-top:18px" @click="router.push('/track')">{{ $t('home.logCheckin') }} <BaseIcon name="arrow" :size="18" /></button>
+    </div>
+
+    <!-- stats -->
+    <div class="row gap14 mt16">
+      <div class="glass card grow" style="padding:16px">
+        <div class="row gap8 center" style="color:var(--accent)"><BaseIcon name="flame" :size="20" /><span class="t-xs strong" style="color:var(--muted)">{{ $t('home.streak') }}</span></div>
+        <div class="h-lg mt8">12 <span style="font-size:14px;font-weight:600;color:var(--muted)">{{ $t('home.days') }}</span></div>
+      </div>
+      <div class="glass card grow" style="padding:16px">
+        <div class="row gap8 center" style="color:var(--accent)"><BaseIcon name="check" :size="20" /><span class="t-xs strong" style="color:var(--muted)">{{ $t('home.adherence') }}</span></div>
+        <div class="h-lg mt8">86<span style="font-size:16px;font-weight:700;color:var(--muted)">%</span></div>
+      </div>
+    </div>
+
+    <!-- plans -->
+    <div class="row between center mt24" style="margin-bottom:12px">
+      <div class="h-md nowrap">{{ $t('home.yourPlans') }}</div>
+      <span class="t-xs strong nowrap" style="color:var(--accent);cursor:pointer" @click="router.push('/chat')">{{ $t('home.new') }}</span>
+    </div>
+    <div class="hscroll">
+      <div v-for="p in plans.plans" :key="p.id" class="glass card" style="width:208px;border-radius:var(--radius-md);cursor:pointer" @click="router.push('/plan/' + p.id)">
+        <div class="row between center">
+          <div class="pico done"><BaseIcon name="pill" :size="18" /></div>
+          <BaseIcon name="chevron" :size="18" />
         </div>
-        <h3 class="text-xl font-semibold text-primary-400 mb-3">{{ t('home.personalizedInsights') }}</h3>
-        <p class="text-gray-400">{{ t('home.personalizedInsightsDescription') }}</p>
+        <div class="h-md mt12">{{ p.name }}</div>
+        <div class="t-xs">{{ p.dose }}</div>
+        <div class="row wrap gap6 mt12"><span v-for="f in p.focus" :key="f" class="tag">{{ f }}</span></div>
+        <div class="bar mt16"><i :style="{ width: p.adherence + '%' }"></i></div>
+      </div>
+      <div class="glass card col center" style="width:130px;border-radius:var(--radius-md);justify-content:center;gap:10px;cursor:pointer;border-style:dashed" @click="router.push('/chat')">
+        <div class="pico"><BaseIcon name="plus" :size="20" /></div>
+        <div class="t-sm strong" style="text-align:center">{{ $t('home.newPlan') }}</div>
+      </div>
+    </div>
+
+    <!-- insights -->
+    <div class="row between center mt24" style="margin-bottom:12px">
+      <div class="h-md nowrap">{{ $t('home.aiInsights') }}</div>
+      <span class="t-xs strong nowrap" style="color:var(--accent);cursor:pointer" @click="router.push('/insights')">{{ $t('home.seeAll') }}</span>
+    </div>
+    <div class="stack">
+      <div v-for="ins in plans.insights.slice(0, 2)" :key="ins.id" class="glass card" style="border-radius:var(--radius-md)">
+        <div class="row gap10 center">
+          <div class="pico" :style="{ color: ins.tone === 'ai' ? 'var(--ai)' : 'var(--accent)' }"><BaseIcon :name="ins.icon" :size="18" /></div>
+          <div class="strong">{{ ins.title }}</div>
+        </div>
+        <div class="t-sm mt8">{{ ins.body }}</div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Add any component-specific styles here */
-</style>

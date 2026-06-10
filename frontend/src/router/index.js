@@ -1,61 +1,25 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import LoginView from '../views/LoginView.vue'
-import RegisterView from '../views/RegisterView.vue'
-import DashboardView from '../views/DashboardView.vue'
-import GeneratePlanView from '../views/GeneratePlanView.vue'
-import ReviewView from '../views/ReviewView.vue'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { useAuth } from '../stores'
 
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginView
-  },
-  {
-    path: '/register',
-    name: 'register',
-    component: RegisterView
-  },
-  {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: DashboardView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/generate-plan',
-    name: 'generate-plan',
-    component: GeneratePlanView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/review/:planId',
-    name: 'review',
-    component: ReviewView,
-    meta: { requiresAuth: true }
-  }
+  { path: '/login', name: 'login', component: () => import('../views/LoginView.vue'), meta: { public: true } },
+  { path: '/', name: 'home', component: () => import('../views/HomeView.vue') },
+  { path: '/chat', name: 'chat', component: () => import('../views/ChatView.vue') },
+  { path: '/plan/:id?', name: 'plan', component: () => import('../views/PlanView.vue') },
+  { path: '/track', name: 'track', component: () => import('../views/TrackView.vue') },
+  { path: '/insights', name: 'insights', component: () => import('../views/InsightsView.vue') },
+  { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  history: createWebHashHistory(),
+  routes,
 })
 
-// Navigation guard for authentication
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('token') !== null
-
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login')
-  } else {
-    next()
-  }
+router.beforeEach((to) => {
+  const auth = useAuth()
+  if (!to.meta.public && !auth.isAuthed) return { name: 'login' }
+  if (to.name === 'login' && auth.isAuthed) return { name: 'home' }
 })
 
 export default router

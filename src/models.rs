@@ -1,15 +1,127 @@
 use bson::{oid::ObjectId, DateTime};
 use serde::{Deserialize, Serialize};
 
+/* ---- User ---- */
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct User {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
-    pub username: String,
     pub email: String,
+    pub name: String,
     pub password_hash: String,
     pub created_at: DateTime,
 }
+
+/* ---- Auth ---- */
+
+#[derive(Debug, Deserialize)]
+pub struct LoginRequest {
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SignupRequest {
+    pub name: String,
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct AuthResponse {
+    pub id: String,
+    pub name: String,
+    pub email: String,
+    pub token: String,
+}
+
+/* ---- Plan ---- */
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Plan {
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    pub id: Option<ObjectId>,
+    pub user_id: ObjectId,
+    pub name: String,
+    pub dose: String,
+    pub focus: Vec<String>,
+    pub adherence: i32,
+    pub created_at: DateTime,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PlanResponse {
+    pub id: String,
+    pub name: String,
+    pub dose: String,
+    pub focus: Vec<String>,
+    pub adherence: i32,
+}
+
+impl From<Plan> for PlanResponse {
+    fn from(p: Plan) -> Self {
+        Self {
+            id: p.id.map(|o| o.to_hex()).unwrap_or_default(),
+            name: p.name,
+            dose: p.dose,
+            focus: p.focus,
+            adherence: p.adherence,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CreatePlanRequest {
+    pub name: String,
+    pub dose: Option<String>,
+    pub focus: Vec<String>,
+}
+
+/* ---- Checkin ---- */
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Checkin {
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    pub id: Option<ObjectId>,
+    pub user_id: ObjectId,
+    pub plan_id: Option<String>,
+    pub mood: String,
+    pub side_effects: Vec<String>,
+    pub note: Option<String>,
+    pub date: DateTime,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CheckinRequest {
+    pub mood: String,
+    #[serde(rename = "sideEffects")]
+    pub side_effects: Vec<String>,
+    pub note: Option<String>,
+    #[serde(rename = "planId")]
+    pub plan_id: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CheckinResponse {
+    pub id: String,
+    pub date: String,
+    pub mood: String,
+    pub side_effects: Vec<String>,
+}
+
+/* ---- Insight ---- */
+
+#[derive(Debug, Serialize)]
+pub struct Insight {
+    pub id: String,
+    pub icon: String,
+    pub tone: String,
+    pub title: String,
+    pub body: String,
+}
+
+/* ---- Legacy (kept for existing /api/medication routes) ---- */
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MedicationPlan {
@@ -35,31 +147,19 @@ pub struct MedicationReview {
     pub rating: i32,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AuthRequest {
-    pub username: String,
-    pub password: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AuthResponse {
-    pub token: String,
-    pub user_id: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct GeneratePlanRequest {
     pub user_id: String,
     pub medication_name: String,
     pub focus_areas: Vec<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct GetPlansQuery {
     pub user_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct MedicationPlanResponse {
     pub id: String,
     pub user_id: String,
@@ -82,7 +182,7 @@ impl From<MedicationPlan> for MedicationPlanResponse {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct MedicationReviewResponse {
     pub id: String,
     pub user_id: String,
@@ -109,7 +209,7 @@ impl From<MedicationReview> for MedicationReviewResponse {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct CreateReviewRequest {
     pub user_id: String,
     pub plan_id: String,

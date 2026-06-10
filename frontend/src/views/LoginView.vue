@@ -1,86 +1,85 @@
 <script setup>
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
+import { useUi, useAuth } from '../stores'
+import BaseIcon from '../components/BaseIcon.vue'
+import LangSelect from '../components/LangSelect.vue'
 
-const authStore = useAuthStore()
+const ui = useUi()
+const auth = useAuth()
 const router = useRouter()
-const { t } = useI18n()
 
-const username = ref('')
+const mode = ref('login')
+const name = ref('')
+const email = ref('')
 const password = ref('')
-const error = ref(null)
-const isLoading = ref(false)
 
-const handleLogin = async () => {
-  try {
-    error.value = null
-    isLoading.value = true
-
-    await authStore.login(username.value, password.value)
-
-    router.push('/dashboard')
-  } catch (err) {
-    error.value = err.error || err.message || t('login.error')
-  } finally {
-    isLoading.value = false
-  }
+async function submit() {
+  if (mode.value === 'signup') await auth.signup({ name: name.value, email: email.value, password: password.value })
+  else await auth.login({ email: email.value, password: password.value })
+  router.push('/')
+}
+async function social(provider) {
+  await auth.oauth(provider)
+  router.push('/')
 }
 </script>
 
 <template>
-  <div class="max-w-md mx-auto mt-12">
-    <div class="bg-navy-800 p-8 rounded-lg shadow-lg border border-navy-700">
-      <h2 class="text-2xl font-bold text-primary-400 text-center mb-6">{{ t('login.title') }}</h2>
+  <div class="screen flush col" style="padding:0 22px;justify-content:center">
+    <div class="row between" style="position:absolute;top:54px;left:22px;right:22px">
+      <LangSelect />
+      <button class="chip" @click="ui.toggleTheme()" style="padding:9px 11px">
+        <BaseIcon :name="ui.dark ? 'sun' : 'moon'" :size="18" />
+      </button>
+    </div>
 
-      <form @submit.prevent="handleLogin" class="space-y-4">
-        <div>
-          <label for="username" class="block text-sm font-medium text-gray-300 mb-1">{{ t('login.username') }}</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            required
-            class="w-full px-3 py-2 bg-navy-900 border border-navy-600 text-gray-100 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-          />
+    <div class="col center" style="gap:14px;margin-bottom:26px">
+      <div style="width:64px;height:64px;border-radius:20px;display:grid;place-items:center;color:#fff;
+        background:linear-gradient(150deg,var(--accent),var(--ai));
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 14px 30px -10px color-mix(in oklab,var(--accent) 60%,transparent)">
+        <BaseIcon name="pill" :size="32" />
+      </div>
+      <div class="col center" style="gap:3px">
+        <div class="h-lg">Medman</div>
+        <div class="t-xs">{{ $t('login.tagline') }}</div>
+      </div>
+    </div>
+
+    <div class="glass strong card" style="border-radius:var(--radius);padding:22px">
+      <div class="h-md" style="margin-bottom:3px">{{ mode === 'signup' ? $t('login.createAccount') : $t('login.welcomeBack') }}</div>
+      <div class="t-xs" style="margin-bottom:16px">
+        {{ mode === 'signup' ? $t('login.startFirst') : $t('login.pickUpWhere') }}
+      </div>
+      <form class="stack" @submit.prevent="submit">
+        <input v-if="mode === 'signup'" v-model="name" class="field" :placeholder="$t('login.fullName')" />
+        <input v-model="email" class="field" type="email" :placeholder="$t('login.email')" />
+        <input v-model="password" class="field" type="password" :placeholder="$t('login.password')" />
+        <div v-if="mode === 'login'" class="row between" style="margin-top:4px">
+          <span class="t-xs">{{ $t('login.rememberMe') }}</span>
+          <span class="t-xs strong" style="color:var(--accent)">{{ $t('login.forgot') }}</span>
         </div>
-
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-300 mb-1">{{ t('login.password') }}</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            required
-            class="w-full px-3 py-2 bg-navy-900 border border-navy-600 text-gray-100 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
-          />
-        </div>
-
-        <div v-if="error" class="bg-red-950 border border-red-700 text-red-300 px-4 py-3 rounded text-sm">
-          {{ error }}
-        </div>
-
-        <button
-          type="submit"
-          :disabled="isLoading"
-          class="w-full bg-primary-600 text-white py-3 px-4 rounded-lg hover:bg-primary-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-        >
-          <span v-if="isLoading">{{ t('login.loggingIn') }}</span>
-          <span v-else>{{ t('login.login') }}</span>
+        <button class="btn primary block lg" type="submit" style="margin-top:12px" :disabled="auth.loading">
+          {{ auth.loading ? $t('login.pleaseWait') : (mode === 'signup' ? $t('login.createAccount') : $t('login.logIn')) }}
         </button>
       </form>
 
-      <div class="mt-4 text-center">
-        <p class="text-sm text-gray-400">
-          {{ t('login.dontHaveAccount') }}
-          <RouterLink to="/register" class="text-primary-400 hover:text-primary-300 hover:underline transition-colors">{{ t('login.register') }}</RouterLink>
-        </p>
+      <div class="row center" style="gap:12px;margin:16px 0;color:var(--muted)">
+        <div class="grow" style="height:1px;background:var(--hair-edge)"></div>
+        <span class="t-xs" style="white-space:nowrap">{{ $t('login.orContinueWith') }}</span>
+        <div class="grow" style="height:1px;background:var(--hair-edge)"></div>
       </div>
+      <div class="row gap10">
+        <button class="btn grow" @click="social('apple')"><BaseIcon name="apple" :size="18" /> Apple</button>
+        <button class="btn grow" @click="social('google')"><BaseIcon name="google" :size="18" /> Google</button>
+      </div>
+    </div>
+
+    <div class="t-sm" style="text-align:center;margin-top:18px">
+      {{ mode === 'signup' ? $t('login.alreadyHaveAccount') + ' ' : $t('login.newToMedman') + ' ' }}
+      <span class="strong" style="color:var(--accent);cursor:pointer" @click="mode = mode === 'signup' ? 'login' : 'signup'">
+        {{ mode === 'signup' ? $t('login.logInLink') : $t('login.createOne') }}
+      </span>
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Component-specific styles */
-</style>

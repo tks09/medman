@@ -1,14 +1,14 @@
 <script setup>
-import { useAuthStore } from '../stores/auth'
-import { useRouter } from 'vue-router'
+import { useAuth } from '../stores'
+import { useRouter, RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
-const authStore = useAuthStore()
+const auth = useAuth()
 const router = useRouter()
 const { t, locale } = useI18n()
 
 const logout = () => {
-  authStore.logout()
+  auth.logout()
   router.push('/login')
 }
 
@@ -19,66 +19,31 @@ const changeLanguage = (lang) => {
 </script>
 
 <template>
-  <nav class="bg-navy-950 text-white shadow-lg border-b border-navy-700">
-    <div class="container mx-auto px-4 py-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <RouterLink to="/" class="text-xl font-bold text-primary-400 hover:text-primary-300 transition-colors">
-            {{ t('navbar.medicineManager') }}
-          </RouterLink>
-          <div v-if="authStore.isAuthenticated" class="hidden md:flex space-x-6">
-            <RouterLink to="/dashboard" class="text-gray-300 hover:text-primary-400 transition-colors">{{ t('navbar.dashboard') }}</RouterLink>
-            <RouterLink to="/generate-plan" class="text-gray-300 hover:text-primary-400 transition-colors">{{ t('navbar.generatePlan') }}</RouterLink>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4">
-          <!-- Language Selector -->
-          <div class="flex space-x-1 bg-navy-800 rounded p-1 border border-navy-600">
-            <button
-              @click="changeLanguage('en')"
-              class="px-3 py-1 text-xs rounded transition-all duration-200"
-              :class="{ 'bg-primary-600 text-white': locale === 'en', 'text-gray-400 hover:text-gray-200': locale !== 'en' }"
-            >
-              EN
-            </button>
-            <button
-              @click="changeLanguage('de')"
-              class="px-3 py-1 text-xs rounded transition-all duration-200"
-              :class="{ 'bg-primary-600 text-white': locale === 'de', 'text-gray-400 hover:text-gray-200': locale !== 'de' }"
-            >
-              DE
-            </button>
-            <button
-              @click="changeLanguage('fr')"
-              class="px-3 py-1 text-xs rounded transition-all duration-200"
-              :class="{ 'bg-primary-600 text-white': locale === 'fr', 'text-gray-400 hover:text-gray-200': locale !== 'fr' }"
-            >
-              FR
-            </button>
-          </div>
-          <template v-if="authStore.isAuthenticated">
-            <span class="text-sm text-gray-300">{{ t('navbar.welcome') }}, {{ authStore.user?.username }}</span>
-            <button @click="logout" class="bg-navy-700 text-gray-200 px-4 py-2 rounded-lg hover:bg-navy-600 hover:text-white transition-all border border-navy-500">
-              {{ t('navbar.logout') }}
-            </button>
-          </template>
-          <template v-else>
-            <RouterLink to="/login" class="text-gray-300 hover:text-primary-400 transition-colors">{{ t('navbar.login') }}</RouterLink>
-            <RouterLink to="/register" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-500 transition-all shadow-sm">
-              {{ t('navbar.register') }}
-            </RouterLink>
-          </template>
+  <div class="glass strong" style="padding: 10px 18px; border-bottom: 1px solid var(--hair); position: relative; z-index: 40;">
+    <div class="row between center">
+      <div class="row gap12 center">
+        <span class="h-md nowrap">{{ t('navbar.medicineManager') }}</span>
+        <div v-if="auth.isAuthed" class="row gap10">
+          <RouterLink to="/dashboard" class="t-sm strong" style="color: var(--ink-2); text-decoration: none;">{{ t('navbar.dashboard') }}</RouterLink>
+          <RouterLink to="/chat" class="t-sm strong" style="color: var(--ink-2); text-decoration: none;">{{ t('navbar.generatePlan') }}</RouterLink>
         </div>
       </div>
+      <div class="row gap10 center">
+        <div class="seg" style="padding: 4px;">
+          <button @click="changeLanguage('en')" :class="{ on: locale === 'en' }" style="font-size: 12px; padding: 4px 8px;">EN</button>
+          <button @click="changeLanguage('de')" :class="{ on: locale === 'de' }" style="font-size: 12px; padding: 4px 8px;">DE</button>
+          <button @click="changeLanguage('fr')" :class="{ on: locale === 'fr' }" style="font-size: 12px; padding: 4px 8px;">FR</button>
+        </div>
+        <template v-if="auth.isAuthed">
+          <span class="t-sm" style="color: var(--ink-2);">{{ t('navbar.welcome') }}, {{ auth.user?.name }}</span>
+          <button class="chip" @click="logout" style="padding: 8px 14px; font-size: 13px;">{{ t('navbar.logout') }}</button>
+        </template>
+        <template v-else>
+          <RouterLink to="/login" class="t-sm strong" style="color: var(--ink-2); text-decoration: none;">{{ t('navbar.login') }}</RouterLink>
+          <RouterLink to="/register" class="chip" style="padding: 8px 14px; font-size: 13px;">{{ t('navbar.register') }}</RouterLink>
+        </template>
+      </div>
     </div>
-  </nav>
+  </div>
 </template>
 
-<style scoped>
-.router-link-active {
-  color: var(--color-primary-400);
-  font-weight: 600;
-  border-bottom: 2px solid var(--color-primary-500);
-  padding-bottom: 2px;
-}
-</style>
